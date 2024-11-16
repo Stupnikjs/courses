@@ -3,15 +3,24 @@
 {{define "content"}}
   
             <div></div>
-            <h1> Base Template </h1>
+            <h1> LISTE DE COURSE  </h1>
             <form hx-post="/post">
                 {{ range .Data.articles }}
                     <div class="form-group">
                         <label > {{.}} </label>
                         <input type="checkbox" name={{ . }}>
-                    <div>
+                    </div>
                 {{ end }}
                 <button type="submit"> Envoyer </button>
+            </form>
+            <form hx-post="/post">
+                {{ range .Data.articles }}
+                    <div class="d-none">
+                        <label > {{.}} </label>
+                        <input type="checkbox" name={{ . }}>
+                    </div>
+                {{ end }}
+                <button type="submit"> Sauvegarder </button>
             </form>
             </div>
         

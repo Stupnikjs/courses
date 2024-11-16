@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -46,6 +47,9 @@ func (app *Application) RenderAccueil(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 	byteCourses, err := io.ReadAll(file)
+	if err != nil {
+		fmt.Println(err)
+	}
 	err = json.Unmarshal(byteCourses, &courses)
 	if err != nil {
 		fmt.Println(err)
@@ -59,13 +63,24 @@ func (app *Application) RenderAccueil(w http.ResponseWriter, r *http.Request) {
 
 // post
 
-func (app *Application) Post(w http.ResponseWriter, r *http.Request) {
+func (app *Application) SelectArticlePost(w http.ResponseWriter, r *http.Request) {
 	body := r.Body
-	bytes, err := io.ReadAll(body)
+	bytesBody, err := io.ReadAll(body)
 	defer body.Close()
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(string(bytes))
+	splited := bytes.Split(bytesBody, []byte("&"))
+
+	for _, b := range splited {
+
+		if bytes.Contains(b, []byte("%20")) {
+			spaceB := bytes.ReplaceAll(b, []byte("%20"), []byte(" "))
+			fmt.Println(string(spaceB))
+		}
+
+	}
+	fmt.Println(string(bytesBody))
+
 	fmt.Println("here")
 }
