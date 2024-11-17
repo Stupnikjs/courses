@@ -13,7 +13,7 @@
                 {{ end }}
                 <button type="submit"> Envoyer </button>
             </form>
-            <form hx-post="/post">
+            <form hx-post="/send">
                 {{ range .Data.articles }}
                     <div class="d-none">
                         <label > {{.}} </label>

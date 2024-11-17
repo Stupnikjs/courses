@@ -2,14 +2,13 @@ package api
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
 	"net/http"
-	"os"
 	"path"
-	"path/filepath"
+
+	"github.com/Stupnikjs/courses/database"
 )
 
 var pathToTemplates = "./static/templates/"
@@ -36,34 +35,21 @@ func render(w http.ResponseWriter, r *http.Request, t string, td *TemplateData) 
 // template rendering
 
 func (app *Application) RenderAccueil(w http.ResponseWriter, r *http.Request) {
-	var courses []string
-	cwd, err := os.Getwd()
 
-	if err != nil {
-		fmt.Println(err)
-	}
-	file, err := os.Open(filepath.Join(cwd, "courses.json"))
-	if err != nil {
-		fmt.Println(err)
-	}
-	byteCourses, err := io.ReadAll(file)
-	if err != nil {
-		fmt.Println(err)
-	}
-	err = json.Unmarshal(byteCourses, &courses)
-	if err != nil {
-		fmt.Println(err)
-	}
 	td := TemplateData{}
+
 	td.Data = make(map[string]any)
-	fmt.Println(courses)
-	td.Data["articles"] = courses
+	// get articles from db
+	articles, _ := app.DB.GetAllArticles()
+	fmt.Println(articles)
+	td.Data["articles"] = articles
 	_ = render(w, r, "/main.gohtml", &td)
 }
 
 // post
 
 func (app *Application) SelectArticlePost(w http.ResponseWriter, r *http.Request) {
+	var SelectedArticles []database.Article
 	body := r.Body
 	bytesBody, err := io.ReadAll(body)
 	defer body.Close()
@@ -73,14 +59,34 @@ func (app *Application) SelectArticlePost(w http.ResponseWriter, r *http.Request
 	splited := bytes.Split(bytesBody, []byte("&"))
 
 	for _, b := range splited {
-
-		if bytes.Contains(b, []byte("%20")) {
-			spaceB := bytes.ReplaceAll(b, []byte("%20"), []byte(" "))
-			fmt.Println(string(spaceB))
+		var article database.Article
+		value := bytes.Split(b, []byte("="))[0]
+		if bytes.Contains(value, []byte("%20")) {
+			spaceB := bytes.ReplaceAll(value, []byte("%20"), []byte(" "))
+			article.Name = string(spaceB)
+			SelectedArticles = append(SelectedArticles, article)
+		} else {
+			article.Name = string(value)
+			SelectedArticles = append(SelectedArticles, article)
 		}
 
 	}
-	fmt.Println(string(bytesBody))
+	fmt.Println(SelectedArticles)
+	err = app.DB.PushSelectedArticles(SelectedArticles)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		return
+	}
 
-	fmt.Println("here")
+}
+func (app *Application) GetAllSelectedArticles(w http.ResponseWriter, r *http.Request) {
+	result, _ := app.DB.GetSelectedArticles()
+	w.Write([]byte(result[0].Name))
+
+}
+func (app *Application) GetAllArticles(w http.ResponseWriter, r *http.Request) {
+	result, _ := app.DB.GetAllArticles()
+
+	w.Write([]byte(result[0].Name))
+
 }
