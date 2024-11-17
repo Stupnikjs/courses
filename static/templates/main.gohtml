@@ -7,17 +7,16 @@
             <form hx-post="/post">
                 {{ range .Data.articles }}
                     <div class="form-group">
-                        <label > {{.}} </label>
-                        <input type="checkbox" name={{ . }}>
-                    </div>
+                        <label > {{.name}} </label>
+                        <input type="checkbox" name={{ .name}}>
                 {{ end }}
                 <button type="submit"> Envoyer </button>
             </form>
             <form hx-post="/send">
                 {{ range .Data.articles }}
                     <div class="d-none">
-                        <label > {{.}} </label>
-                        <input type="checkbox" name={{ . }}>
+                        <label > {{ .name }} </label>
+                        <input type="checkbox" name={{ .name }}>
                     </div>
                 {{ end }}
                 <button type="submit"> Sauvegarder </button>

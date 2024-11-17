@@ -14,16 +14,13 @@ import (
 )
 
 func main() {
-	/*
-		if err := godotenv.Load("./.env"); err != nil {
-			log.Fatalf("Error loading .env file: %v", err)
-		}
-	*/
+
 	app := api.Application{
 		Port: 8080,
 	}
 
 	conn, err := api.ConnectToDB()
+
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -31,9 +28,21 @@ func main() {
 	app.DB = &database.PostgresRepo{
 		DB: conn,
 	}
-	articles := loadArticles()
-	fmt.Println(articles)
+	articles, err := loadArticles()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	_, err = app.DB.DB.Exec("DROP TABLE article ; ")
+
+	if err != nil {
+		fmt.Println(err)
+	}
 	err = app.DB.InitTables(articles)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -42,30 +51,30 @@ func main() {
 
 }
 
-func loadArticles() []database.Article {
+func loadArticles() ([]database.Article, error) {
 	var courses []string
 	var articles []database.Article
 	cwd, err := os.Getwd()
 
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 	file, err := os.Open(filepath.Join(cwd, "courses.json"))
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 	byteCourses, err := io.ReadAll(file)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 	err = json.Unmarshal(byteCourses, &courses)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 	for _, c := range courses {
 		var article database.Article
 		article.Name = c
 		articles = append(articles, article)
 	}
-	return articles
+	return articles, nil
 }

@@ -39,17 +39,19 @@ func (m *PostgresRepo) GetSelectedArticles() ([]Article, error) {
 func (m *PostgresRepo) GetAllArticles() ([]Article, error) {
 	var articles []Article
 	ctx := context.Background()
-	query := ` SELECT * FROM article; `
+	query := ` SELECT name FROM article; `
 	rows, err := m.DB.QueryContext(ctx, query)
 
 	if err != nil {
 		fmt.Println(err)
 	}
 	for rows.Next() {
+		var text string
 		var article Article
-		err = rows.Scan(&article.Name)
+		err = rows.Scan(&text)
 
-		if err != nil {
+		if err == nil {
+			article.Name = text
 			articles = append(articles, article)
 		} else {
 			return articles, err
@@ -57,7 +59,7 @@ func (m *PostgresRepo) GetAllArticles() ([]Article, error) {
 
 	}
 	defer rows.Close()
-	fmt.Println(articles)
+
 	return articles, nil
 
 }
@@ -84,9 +86,8 @@ func (m *PostgresRepo) InitTables(articles []Article) error {
 	if err != nil {
 		return err
 	}
+
 	query := `INSERT INTO article (name) VALUES ($1); `
-	_, err = m.DB.ExecContext(ctx, query, "test")
-	query = `INSERT INTO article (name) VALUES ($1); `
 	for _, a := range articles {
 		_, err := m.DB.ExecContext(ctx, query, a.Name)
 		if err != nil {

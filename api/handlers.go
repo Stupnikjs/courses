@@ -41,7 +41,7 @@ func (app *Application) RenderAccueil(w http.ResponseWriter, r *http.Request) {
 	td.Data = make(map[string]any)
 	// get articles from db
 	articles, _ := app.DB.GetAllArticles()
-	fmt.Println(articles)
+
 	td.Data["articles"] = articles
 	_ = render(w, r, "/main.gohtml", &td)
 }
@@ -81,12 +81,10 @@ func (app *Application) SelectArticlePost(w http.ResponseWriter, r *http.Request
 }
 func (app *Application) GetAllSelectedArticles(w http.ResponseWriter, r *http.Request) {
 	result, _ := app.DB.GetSelectedArticles()
-	w.Write([]byte(result[0].Name))
-
+	fmt.Println("handler getall", result)
 }
 func (app *Application) GetAllArticles(w http.ResponseWriter, r *http.Request) {
 	result, _ := app.DB.GetAllArticles()
-
-	w.Write([]byte(result[0].Name))
+	fmt.Println("handler getall", result)
 
 }
