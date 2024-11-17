@@ -85,6 +85,8 @@ func (m *PostgresRepo) InitTables(articles []Article) error {
 		return err
 	}
 	query := `INSERT INTO article (name) VALUES ($1); `
+	_, err = m.DB.ExecContext(ctx, query, "test")
+	query = `INSERT INTO article (name) VALUES ($1); `
 	for _, a := range articles {
 		_, err := m.DB.ExecContext(ctx, query, a.Name)
 		if err != nil {
