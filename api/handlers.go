@@ -45,6 +45,17 @@ func (app *Application) RenderAccueil(w http.ResponseWriter, r *http.Request) {
 	td.Data["articles"] = articles
 	_ = render(w, r, "/main.gohtml", &td)
 }
+func (app *Application) RenderAddArticle(w http.ResponseWriter, r *http.Request) {
+
+	td := TemplateData{}
+
+	td.Data = make(map[string]any)
+	// get articles from db
+	articles, _ := app.DB.GetAllArticles()
+
+	td.Data["articles"] = articles
+	_ = render(w, r, "/addarticle.gohtml", &td)
+}
 
 // post
 
@@ -79,12 +90,21 @@ func (app *Application) SelectArticlePost(w http.ResponseWriter, r *http.Request
 	}
 
 }
-func (app *Application) GetAllSelectedArticles(w http.ResponseWriter, r *http.Request) {
-	result, _ := app.DB.GetSelectedArticles()
-	fmt.Println("handler getall", result)
-}
-func (app *Application) GetAllArticles(w http.ResponseWriter, r *http.Request) {
-	result, _ := app.DB.GetAllArticles()
-	fmt.Println("handler getall", result)
+
+func (app *Application) PostAddArticle(w http.ResponseWriter, r *http.Request) {
+
+	body := r.Body
+	bytesBody, err := io.ReadAll(body)
+	defer body.Close()
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(string(bytesBody))
+	err = app.DB.InsertOneArticle(string(bytesBody))
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		return
+	}
+	w.Write(bytesBody)
 
 }

@@ -2,9 +2,9 @@
 
 {{define "content"}}
   
-            <div></div>
             <h1> LISTE DE COURSE  </h1>
-            <form hx-post="/post">
+            <a href="/add"> Ajouter/Supprimer items </a>
+            <form hx-post="/post" class="formAcceuil">
                 {{ range .Data.articles }}
                     <div class="form-group">
                         <label > {{.Name}} </label>
@@ -21,6 +21,6 @@
                 {{ end }}
                 <button type="submit"> Sauvegarder </button>
             </form>
-            </div>
+            
         
 {{end}}

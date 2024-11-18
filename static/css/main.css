@@ -57,12 +57,17 @@ h1 {
   display: none;
 }
 
-form {
-  display: flex;
-  flex-direction: column;
+.formAcceuil {
+  height: 80vh;
 }
+
+
+.formInsert {
+  height: 20vh;
+}
+
+
 .form-group {
-  display: flex;
   width: 100%;
   justify-content: space-around;
   background-color: aliceblue;

@@ -1,0 +1,30 @@
+{{template "base" .}}
+
+{{define "content"}}
+  
+                    <form hx-post="/addOne" class="formInsert">  
+                            <label> ajouter un item  </label>
+                            <input type="text" name="article">
+                            <button type="submit" > Envoyer </button>
+                    </form>
+                {{ range .Data.articles }}
+                    <div class="form-group">
+                        <form hx-post="/delete/{{ .Name }}">  
+                            <label> {{.Name}} </label>
+                            <button type="submit" > X </button>
+                        </form>
+                       
+                    </div>
+                {{ end }}
+             
+            <form hx-post="/send">
+                {{ range .Data.articles }}
+                    <div class="d-none">
+                        <label > {{ .Name }} </label>
+                        <input type="checkbox" name={{ .Name }}>
+                    </div>
+                {{ end }}
+                <button type="submit"> Sauvegarder </button>
+            </form>
+        
+{{end}}
