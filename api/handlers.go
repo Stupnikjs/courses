@@ -99,12 +99,16 @@ func (app *Application) PostAddArticle(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(string(bytesBody))
-	err = app.DB.InsertOneArticle(string(bytesBody))
+	articleName, found := bytes.CutPrefix(bytesBody, []byte("article="))
+	if !found {
+		w.Write([]byte(err.Error()))
+	}
+	articleName = bytes.Replace(articleName, []byte("%20"), []byte(" "), 10)
+	err = app.DB.InsertOneArticle(string(articleName))
 	if err != nil {
 		w.Write([]byte(err.Error()))
 		return
 	}
-	w.Write(bytesBody)
+	w.Write([]byte(string(bytesBody)))
 
 }
